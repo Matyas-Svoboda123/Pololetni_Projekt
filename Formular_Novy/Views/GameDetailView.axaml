@@ -1,0 +1,133 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Formular_Novy.ViewModels"
+             x:DataType="vm:GameDetailViewModel"
+             x:Class="Formular_Novy.Views.GameDetailView"
+             x:CompileBindings="False">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="16">
+
+        <!-- ═══ Navigační lišta ══════════════════════════════ -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,12">
+            <Button Content="← Zpět na seznam"
+                    Command="{Binding GoBackCommand}"
+                    Padding="10,6" />
+        </StackPanel>
+
+        <!-- ═══ Info o hře ═══════════════════════════════════ -->
+        <Border Grid.Row="1"
+                Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+                CornerRadius="8"
+                Padding="16"
+                Margin="0,0,0,16">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Spacing="4">
+                    <TextBlock Text="{Binding Game.Title}"
+                               FontSize="22" FontWeight="Bold" />
+                    <StackPanel Orientation="Horizontal" Spacing="20" Margin="0,4,0,0">
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="Vývojář: {0}">
+                                    <Binding Path="Game.Developer" FallbackValue="—" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="Rok: {0}">
+                                    <Binding Path="Game.ReleaseYear" FallbackValue="—" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="Platforma: {0}">
+                                    <Binding Path="Game.Platform.Name" FallbackValue="—" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                    <TextBlock Text="{Binding Game.Notes}"
+                               Opacity="0.7"
+                               TextWrapping="Wrap"
+                               Margin="0,4,0,0" />
+                </StackPanel>
+
+                <!-- Celkový čas -->
+                <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding TotalHours, StringFormat={}{0:F1} h}"
+                               FontSize="28" FontWeight="Bold"
+                               HorizontalAlignment="Center" />
+                    <TextBlock Text="celkem odehráno"
+                               FontSize="11" Opacity="0.6"
+                               HorizontalAlignment="Center" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ═══ Herní relace ═════════════════════════════════ -->
+        <Grid Grid.Row="2" RowDefinitions="Auto,*">
+
+            <!-- Hlavička sekce s tlačítkem -->
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+                <TextBlock Grid.Column="0"
+                           Text="Herní relace"
+                           FontSize="16" FontWeight="SemiBold"
+                           VerticalAlignment="Center" />
+                <Button Grid.Column="1"
+                        Content="+ Přidat relaci"
+                        Command="{Binding AddSessionCommand}"
+                        Padding="12,6" />
+            </Grid>
+
+            <!-- Tabulka relací -->
+            <DataGrid Grid.Row="1"
+                      ItemsSource="{Binding Sessions}"
+                      SelectedItem="{Binding SelectedSession, Mode=TwoWay}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserResizeColumns="True"
+                      GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column">
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Datum"
+                                        Binding="{Binding SessionDate, StringFormat={}{0:d. M. yyyy}}"
+                                        Width="130" />
+                    <DataGridTextColumn Header="Hodin"
+                                        Binding="{Binding HoursPlayed, StringFormat={}{0:F2}}"
+                                        Width="90" />
+                    <DataGridTextColumn Header="Poznámky"
+                                        Binding="{Binding Notes}"
+                                        Width="*" />
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <!-- ═══ Akce nad relacemi ════════════════════════════ -->
+        <StackPanel Grid.Row="3"
+                    Orientation="Horizontal"
+                    Spacing="8"
+                    Margin="0,10,0,0">
+
+            <Button Content="✏️ Upravit relaci"
+                    Command="{Binding EditSelectedSessionCommand}"
+                    Padding="12,6" />
+            <Button Content="🗑️ Smazat relaci"
+                    Command="{Binding DeleteSelectedSessionCommand}"
+                    Padding="12,6" />
+
+            <TextBlock Text="← Vyberte relaci v tabulce"
+                       VerticalAlignment="Center"
+                       Opacity="0.5"
+                       FontStyle="Italic"
+                       Margin="8,0,0,0">
+                <TextBlock.IsVisible>
+                    <Binding Path="SelectedSession"
+                             Converter="{x:Static ObjectConverters.IsNull}" />
+                </TextBlock.IsVisible>
+            </TextBlock>
+        </StackPanel>
+
+    </Grid>
+</UserControl>

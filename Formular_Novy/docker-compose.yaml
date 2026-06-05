@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: game_tracker_db
+    restart: always
+
+    # .env soubor nastaví proměnné dostupné v sekci environment níže
+    env_file:
+      - .env
+
+    environment:
+      POSTGRES_USER: ${Username}
+      POSTGRES_PASSWORD: ${Password}
+      POSTGRES_DB: ${Database}
+
+    ports:
+      # Mapování: hostitelský port (z .env) → port v kontejneru (PostgreSQL vždy 5432)
+      - "${Port}:5432"
+
+    volumes:
+      # Persistentní data — přežijí restart kontejneru i docker compose down/up
+      - pgdata:/var/lib/postgresql/data
+      # Inicializační skripty — spustí se jen při prvním startu (prázdný volume)
+      - ./schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./seed.sql:/docker-entrypoint-initdb.d/02_seed.sql
+
+# Pojmenovaný volume — Docker ho spravuje sám (nevytváří složku v projektu)
+volumes:
+  pgdata:

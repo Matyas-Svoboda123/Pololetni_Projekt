@@ -1,0 +1,84 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Formular_Novy.ViewModels"
+             x:DataType="vm:GameListViewModel"
+             x:Class="Formular_Novy.Views.GameListView"
+             x:CompileBindings="False">
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="16">
+
+        <!-- ═══ Header ════════════════════════════════════════ -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="🎮 Game Tracker"
+                           FontSize="26" FontWeight="Bold" />
+                <TextBlock Text="Správa herní knihovny"
+                           FontSize="13" Opacity="0.6" Margin="0,2,0,0"/>
+            </StackPanel>
+            <Button Grid.Column="1"
+                    Content="+ Přidat hru"
+                    Command="{Binding AddGameCommand}"
+                    VerticalAlignment="Center"
+                    Padding="14,8" />
+        </Grid>
+
+        <!-- ═══ Tabulka her ═══════════════════════════════════ -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding Games}"
+                  SelectedItem="{Binding SelectedGame, Mode=TwoWay}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  CanUserResizeColumns="True"
+                  GridLinesVisibility="Horizontal"
+                  HeadersVisibility="Column">
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Název hry"
+                                    Binding="{Binding Title}"
+                                    Width="220" />
+                <DataGridTextColumn Header="Vývojář"
+                                    Binding="{Binding Developer}"
+                                    Width="160" />
+                <DataGridTextColumn Header="Rok vydání"
+                                    Binding="{Binding ReleaseYear}"
+                                    Width="90" />
+                <DataGridTextColumn Header="Platforma"
+                                    Binding="{Binding Platform.Name}"
+                                    Width="130" />
+                <DataGridTextColumn Header="Poznámky"
+                                    Binding="{Binding Notes}"
+                                    Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- ═══ Akční tlačítka (aktivní jen při výběru) ═════ -->
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    Spacing="8"
+                    Margin="0,10,0,0">
+
+            <Button Content="📋 Detail"
+                    Command="{Binding GoToDetailCommand}"
+                    Padding="12,6" />
+            <Button Content="✏️ Upravit"
+                    Command="{Binding EditSelectedGameCommand}"
+                    Padding="12,6" />
+            <Button Content="🗑️ Smazat"
+                    Command="{Binding DeleteSelectedGameCommand}"
+                    Padding="12,6" />
+
+            <!-- Info text pokud není nic vybráno -->
+            <TextBlock Text="← Vyberte hru v tabulce"
+                       VerticalAlignment="Center"
+                       Opacity="0.5"
+                       FontStyle="Italic"
+                       Margin="8,0,0,0">
+                <TextBlock.IsVisible>
+                    <Binding Path="SelectedGame"
+                             Converter="{x:Static ObjectConverters.IsNull}" />
+                </TextBlock.IsVisible>
+            </TextBlock>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

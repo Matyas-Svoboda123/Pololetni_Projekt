@@ -1,0 +1,18 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Formular_Novy.ViewModels"
+        x:Class="Formular_Novy.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="Game Tracker"
+        Width="950" Height="650"
+        MinWidth="750" MinHeight="500"
+        WindowStartupLocation="CenterScreen">
+
+    <!--
+        ContentControl zobrazuje aktuální "stránku" (ViewModel).
+        ViewLocator automaticky najde odpovídající View podle jména třídy.
+        Např. GameListViewModel → GameListView, GameDetailViewModel → GameDetailView.
+    -->
+    <ContentControl Content="{Binding CurrentPage}" />
+
+</Window>

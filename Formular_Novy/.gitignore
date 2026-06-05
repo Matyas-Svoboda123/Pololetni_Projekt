@@ -1,0 +1,14 @@
+# Skutečná konfigurace — nikdy necommitovat (obsahuje hesla)!
+.env
+
+# Build výstupy
+bin/
+obj/
+
+# IDE soubory
+.vs/
+.idea/
+*.user
+
+# Docker data (lokální volume)
+/Docker/

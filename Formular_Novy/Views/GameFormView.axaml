@@ -1,0 +1,87 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Formular_Novy.ViewModels"
+        x:DataType="vm:GameFormViewModel"
+        x:Class="Formular_Novy.Views.GameFormView"
+        x:CompileBindings="False"
+        Title="{Binding WindowTitle}"
+        Width="440" Height="420"
+        MinWidth="380" MinHeight="380"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False">
+
+    <Grid RowDefinitions="*,Auto" Margin="20">
+
+        <!-- ═══ Formulář ════════════════════════════════════ -->
+        <StackPanel Grid.Row="0" Spacing="12">
+
+            <!-- Název (povinný) -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Název hry *" FontWeight="SemiBold" />
+                <TextBox Text="{Binding Title, Mode=TwoWay}"
+                         Watermark="Zadejte název hry" />
+            </StackPanel>
+
+            <!-- Vývojář -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Vývojář" FontWeight="SemiBold" />
+                <TextBox Text="{Binding Developer, Mode=TwoWay}"
+                         Watermark="Např. CD Projekt RED" />
+            </StackPanel>
+
+            <!-- Rok vydání -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Rok vydání" FontWeight="SemiBold" />
+                <TextBox Text="{Binding ReleaseYear, Mode=TwoWay}"
+                         Watermark="Např. 2023" />
+            </StackPanel>
+
+            <!-- Platforma (povinná) — ComboBox napojen na číselník -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Platforma *" FontWeight="SemiBold" />
+                <ComboBox ItemsSource="{Binding Platforms}"
+                          SelectedItem="{Binding SelectedPlatform, Mode=TwoWay}"
+                          PlaceholderText="Vyberte platformu"
+                          HorizontalAlignment="Stretch" />
+            </StackPanel>
+
+            <!-- Poznámky -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Poznámky" FontWeight="SemiBold" />
+                <TextBox Text="{Binding Notes, Mode=TwoWay}"
+                         Watermark="Volitelné poznámky..."
+                         AcceptsReturn="True"
+                         Height="70"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+
+            <!-- Chybová zpráva validace -->
+            <Border Background="#FFE4E1"
+                    CornerRadius="4"
+                    Padding="10,6"
+                    IsVisible="{Binding ValidationError,
+                                Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <TextBlock Text="{Binding ValidationError}"
+                           Foreground="DarkRed"
+                           TextWrapping="Wrap" />
+            </Border>
+
+        </StackPanel>
+
+        <!-- ═══ Tlačítka ══════════════════════════════════════ -->
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="8"
+                    Margin="0,12,0,0">
+            <Button Content="Zrušit"
+                    Command="{Binding CancelCommand}"
+                    Padding="16,8" />
+            <Button Content="Uložit"
+                    Command="{Binding SaveCommand}"
+                    Padding="16,8" />
+        </StackPanel>
+
+    </Grid>
+</Window>

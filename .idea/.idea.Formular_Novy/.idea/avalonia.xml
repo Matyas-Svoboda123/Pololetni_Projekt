@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="Formular_Novy/App.axaml" value="Formular_Novy/Formular_Novy.csproj" />
+        <entry key="Formular_Novy/Views/MainWindow.axaml" value="Formular_Novy/Formular_Novy.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

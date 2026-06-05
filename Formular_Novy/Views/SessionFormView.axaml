@@ -1,0 +1,79 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Formular_Novy.ViewModels"
+        x:DataType="vm:SessionFormViewModel"
+        x:Class="Formular_Novy.Views.SessionFormView"
+        x:CompileBindings="False"
+        Title="{Binding WindowTitle}"
+        Width="380" Height="320"
+        MinWidth="340" MinHeight="300"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False">
+
+    <Grid RowDefinitions="*,Auto" Margin="20">
+
+        <!-- ═══ Formulář ════════════════════════════════════ -->
+        <StackPanel Grid.Row="0" Spacing="12">
+
+            <!-- Datum relace (povinný) -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Datum *" FontWeight="SemiBold" />
+                <!--
+                    DatePicker pracuje s DateTimeOffset.
+                    SelectedDate je vázáno na SessionDate v SessionFormViewModel.
+                -->
+                <DatePicker SelectedDate="{Binding SessionDate, Mode=TwoWay}"
+                            HorizontalAlignment="Stretch" />
+            </StackPanel>
+
+            <!-- Počet hodin (povinný) -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Počet hodin *" FontWeight="SemiBold" />
+                <NumericUpDown Value="{Binding HoursPlayed, Mode=TwoWay}"
+                               Minimum="0.1"
+                               Maximum="24"
+                               Increment="0.5"
+                               FormatString="F2"
+                               HorizontalAlignment="Stretch" />
+            </StackPanel>
+
+            <!-- Poznámky -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="Poznámky" FontWeight="SemiBold" />
+                <TextBox Text="{Binding Notes, Mode=TwoWay}"
+                         Watermark="Volitelné poznámky..."
+                         AcceptsReturn="True"
+                         Height="60"
+                         TextWrapping="Wrap" />
+            </StackPanel>
+
+            <!-- Chybová zpráva validace -->
+            <Border Background="#FFE4E1"
+                    CornerRadius="4"
+                    Padding="10,6"
+                    IsVisible="{Binding ValidationError,
+                                Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                <TextBlock Text="{Binding ValidationError}"
+                           Foreground="DarkRed"
+                           TextWrapping="Wrap" />
+            </Border>
+
+        </StackPanel>
+
+        <!-- ═══ Tlačítka ══════════════════════════════════════ -->
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="8"
+                    Margin="0,12,0,0">
+            <Button Content="Zrušit"
+                    Command="{Binding CancelCommand}"
+                    Padding="16,8" />
+            <Button Content="Uložit"
+                    Command="{Binding SaveCommand}"
+                    Padding="16,8" />
+        </StackPanel>
+
+    </Grid>
+</Window>

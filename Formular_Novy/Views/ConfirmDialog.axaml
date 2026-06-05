@@ -1,0 +1,36 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="Formular_Novy.Views.ConfirmDialog"
+        x:CompileBindings="False"
+        Title="Potvrdit akci"
+        Width="380" Height="170"
+        MinWidth="300" MinHeight="150"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False">
+
+    <Grid RowDefinitions="*,Auto" Margin="20">
+
+        <!-- Zpráva -->
+        <TextBlock Grid.Row="0"
+                   Name="MessageText"
+                   TextWrapping="Wrap"
+                   VerticalAlignment="Center"
+                   FontSize="14" />
+
+        <!-- Tlačítka -->
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="8"
+                    Margin="0,12,0,0">
+            <Button Name="NoButton"
+                    Content="Ne"
+                    Padding="16,8" />
+            <Button Name="YesButton"
+                    Content="Ano"
+                    Padding="16,8" />
+        </StackPanel>
+
+    </Grid>
+</Window>
