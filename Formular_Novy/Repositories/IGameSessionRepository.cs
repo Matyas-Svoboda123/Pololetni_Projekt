@@ -12,4 +12,5 @@ public interface IGameSessionRepository
     Task<int> AddAsync(GameSession session);    // Vrátí nové ID
     Task UpdateAsync(GameSession session);
     Task DeleteAsync(int id);
+    Task<decimal> GetTotalHoursAsync();
 }

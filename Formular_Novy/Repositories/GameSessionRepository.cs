@@ -103,4 +103,15 @@ public class GameSessionRepository : IGameSessionRepository
 
         await cmd.ExecuteNonQueryAsync();
     }
+
+    public async Task<decimal> GetTotalHoursAsync()
+    {
+        await using var conn = new NpgsqlConnection(_connectionString);
+        await conn.OpenAsync();
+
+        await using var cmd = new NpgsqlCommand(
+            "SELECT COALESCE(SUM(hours_played), 0) FROM game_sessions", conn);
+
+        return (decimal)(await cmd.ExecuteScalarAsync())!;
+    }
 }

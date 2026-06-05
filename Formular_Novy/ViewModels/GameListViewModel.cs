@@ -7,44 +7,94 @@ using Formular_Novy.Services;
 
 namespace Formular_Novy.ViewModels;
 
-/// <summary>
-/// View 1 — seznam her.
-/// Zobrazuje všechny hry, umožňuje přidání, úpravu, smazání a přechod na detail.
-/// </summary>
+public record PlatformStat(string Name, int Count)
+{
+    public override string ToString() => $"{Name}: {Count}";
+}
+
 public partial class GameListViewModel : ViewModelBase
 {
     private readonly IGameRepository _gameRepo;
+    private readonly IPlatformRepository _platformRepo;
+    private readonly IGameSessionRepository _sessionRepo;
     private readonly NavigationService _nav;
     private readonly IDialogService _dialogService;
-    private readonly Func<GameDetailViewModel> _detailVmFactory; // Továrna pro detail VM
+    private readonly Func<GameDetailViewModel> _detailVmFactory;
 
-    [ObservableProperty]
-    private ObservableCollection<Game> _games = new();
+    [ObservableProperty] private ObservableCollection<Game> _games = new();
+    [ObservableProperty] private ObservableCollection<Game> _filteredGames = new();
+    [ObservableProperty] private Game? _selectedGame;
 
-    // Vybraná hra v DataGridu — podle ní se povolují/zakazují akční tlačítka
-    [ObservableProperty]
-    private Game? _selectedGame;
+    // Filtrování
+    [ObservableProperty] private string _searchText = string.Empty;
+    [ObservableProperty] private Platform? _selectedFilterPlatform;
+    [ObservableProperty] private ObservableCollection<Platform> _filterPlatforms = new();
+
+    // Statistiky
+    [ObservableProperty] private int _totalGames;
+    [ObservableProperty] private decimal _totalHours;
+    [ObservableProperty] private ObservableCollection<PlatformStat> _platformStats = new();
 
     public GameListViewModel(
         IGameRepository gameRepo,
+        IPlatformRepository platformRepo,
+        IGameSessionRepository sessionRepo,
         NavigationService nav,
         IDialogService dialogService,
         Func<GameDetailViewModel> detailVmFactory)
     {
         _gameRepo = gameRepo;
+        _platformRepo = platformRepo;
+        _sessionRepo = sessionRepo;
         _nav = nav;
         _dialogService = dialogService;
         _detailVmFactory = detailVmFactory;
     }
 
-    /// <summary>Načte všechny hry z DB a naplní kolekci Games.</summary>
     public async Task LoadAsync()
     {
         var games = await _gameRepo.GetAllAsync();
         Games = new ObservableCollection<Game>(games);
+
+        var platforms = await _platformRepo.GetAllAsync();
+        FilterPlatforms = new ObservableCollection<Platform>(platforms);
+
+        TotalHours = await _sessionRepo.GetTotalHoursAsync();
+
+        ApplyFilter();
     }
 
-    // Při změně vybrané hry informujeme příkazy, aby znovu vyhodnotily CanExecute
+    private void ApplyFilter()
+    {
+        var filtered = Games.AsEnumerable();
+
+        if (!string.IsNullOrWhiteSpace(SearchText))
+            filtered = filtered.Where(g =>
+                g.Title.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                (g.Developer?.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ?? false));
+
+        if (SelectedFilterPlatform != null)
+            filtered = filtered.Where(g => g.PlatformId == SelectedFilterPlatform.Id);
+
+        FilteredGames = new ObservableCollection<Game>(filtered);
+
+        // Pokud vybraná hra zmizela z filtrovaného seznamu, zrušíme výběr
+        if (SelectedGame != null && !FilteredGames.Contains(SelectedGame))
+            SelectedGame = null;
+
+        // Statistiky vždy z celé kolekce (nezávisle na filtru)
+        TotalGames = Games.Count;
+        PlatformStats = new ObservableCollection<PlatformStat>(
+            Games
+                .GroupBy(g => g.Platform?.Name ?? "—")
+                .OrderByDescending(g => g.Count())
+                .Select(g => new PlatformStat(g.Key, g.Count()))
+        );
+    }
+
+    partial void OnSearchTextChanged(string value) => ApplyFilter();
+    partial void OnSelectedFilterPlatformChanged(Platform? value) => ApplyFilter();
+
     partial void OnSelectedGameChanged(Game? value)
     {
         GoToDetailCommand.NotifyCanExecuteChanged();
@@ -54,14 +104,18 @@ public partial class GameListViewModel : ViewModelBase
 
     private bool IsGameSelected => SelectedGame != null;
 
-    // ── Příkazy ────────────────────────────────────────────────────
+    [RelayCommand]
+    private void ClearFilter()
+    {
+        SearchText = string.Empty;
+        SelectedFilterPlatform = null;
+    }
 
     [RelayCommand]
     private async Task AddGame()
     {
-        // Otevře dialog formuláře (bez předaného game = nová hra)
         var saved = await _dialogService.ShowGameFormAsync();
-        if (saved) await LoadAsync(); // Obnovíme seznam
+        if (saved) await LoadAsync();
     }
 
     [RelayCommand(CanExecute = nameof(IsGameSelected))]
@@ -74,7 +128,6 @@ public partial class GameListViewModel : ViewModelBase
     [RelayCommand(CanExecute = nameof(IsGameSelected))]
     private async Task DeleteSelectedGame()
     {
-        // Potvrzovací dialog — upozorní, že se smažou i relace (CASCADE)
         var confirmed = await _dialogService.ConfirmAsync(
             $"Opravdu smazat hru '{SelectedGame!.Title}'?\nBudou smazány i všechny herní relace.");
 
@@ -89,7 +142,6 @@ public partial class GameListViewModel : ViewModelBase
     [RelayCommand(CanExecute = nameof(IsGameSelected))]
     private async Task GoToDetail()
     {
-        // Vytvoříme nový GameDetailViewModel přes továrnu a přejdeme na něj
         var detailVm = _detailVmFactory();
         await detailVm.LoadGameAsync(SelectedGame!.Id);
         _nav.NavigateTo(detailVm);

@@ -5,8 +5,8 @@
         x:Class="Formular_Novy.Views.GameFormView"
         x:CompileBindings="False"
         Title="{Binding WindowTitle}"
-        Width="440" Height="420"
-        MinWidth="380" MinHeight="380"
+        Width="440" Height="490"
+        MinWidth="380" MinHeight="490"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         ShowInTaskbar="False">

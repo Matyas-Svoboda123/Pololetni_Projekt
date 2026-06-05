@@ -12,7 +12,7 @@ Desktopová aplikace pro sledování herní knihovny. Napsaná v **Avalonia UI**
 
 ## Požadavky
 
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [.NET 8 SDK](https://dotnet.microsoft.com/download)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop)
 
 ## Spuštění projektu
@@ -21,7 +21,7 @@ Desktopová aplikace pro sledování herní knihovny. Napsaná v **Avalonia UI**
 
 ```bash
 git clone <url-repozitáře>
-cd Formular_Novy
+cd Formular_Novy/Formular_Novy
 ```
 
 ### 2. Vytvoření konfiguračního souboru
@@ -70,12 +70,32 @@ Formular_Novy/
 
 ## Databázové schéma
 
-```
-platforms (id, name)
-    ↑
-games (id, title, developer, release_year, platform_id FK, notes)
-    ↑
-game_sessions (id, game_id FK CASCADE, session_date, hours_played, notes)
+```mermaid
+erDiagram
+    platforms {
+        serial id PK
+        varchar name
+    }
+
+    games {
+        serial id PK
+        varchar title
+        varchar developer
+        integer release_year
+        integer platform_id FK
+        text notes
+    }
+
+    game_sessions {
+        serial id PK
+        integer game_id FK
+        date session_date
+        numeric hours_played
+        text notes
+    }
+
+    platforms ||--o{ games : "1:N"
+    games ||--o{ game_sessions : "1:N"
 ```
 
 ## Zastavení databáze
